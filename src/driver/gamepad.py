@@ -1,8 +1,8 @@
 import pygame
 import json
 
-config = json.load(open("src/config.json", "r"))
-# config = json.load(open("config.json", "r"))
+# config = json.load(open("src/config.json", "r"))
+config = json.load(open("config.json", "r"))
 SUPPORTED_GAMEPAD = ["Controller (Xbox One For Windows)"]
 
 class Gamepad:

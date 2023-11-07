@@ -5,17 +5,17 @@ from scipy.spatial.transform import Rotation as R
 import json
 import time
 
-config = json.load(open("src\config.json", "r"))
-# config = json.load(open("config.json", "r"))
+# config = json.load(open("src/config.json", "r"))
+config = None
 
-NORMAL_SPEED_FILTER = np.array([0.05, 0.05, 0.05]) * config["normal_mov_speed"]
-NORMAL_ROT_FILTER = np.array([0.02, 0.02, 0.02]) * config["normal_rot_speed"]
+NORMAL_SPEED_FILTER = None
+NORMAL_ROT_FILTER = None
 # ALT_SPEED_FILTER = np.array([1, 1, 1]) * config["alt_mov_speed"]
 # ALT_ROT_FILTER = np.array([1, 1, 1]) * config["alt_rot_speed"]
-ZOOM_SPEED = 0.003 * config["zoom_speed"]
-EXPOSURE_SPEED = 0.003 * config["exposure_speed"]
-APERTURE_SPEED = 0.003 * config["aperture_speed"]
-FOCUS_SPEED = 0.003 * config["focus_speed"]
+ZOOM_SPEED = None
+EXPOSURE_SPEED = None
+APERTURE_SPEED = None
+FOCUS_SPEED = None
 
 
 def constrain(x: float, min_value: float = 0, max_value: float = 1) -> float:
@@ -24,6 +24,29 @@ def constrain(x: float, min_value: float = 0, max_value: float = 1) -> float:
 
 def normalize(v):
     return v / np.linalg.norm(v)
+
+
+def reload_config():
+    global config
+    global NORMAL_SPEED_FILTER
+    global NORMAL_ROT_FILTER
+    global ZOOM_SPEED
+    global EXPOSURE_SPEED
+    global APERTURE_SPEED
+    global FOCUS_SPEED
+    config = json.load(open("config.json", "r"))
+    NORMAL_SPEED_FILTER = np.array([0.05, 0.05, 0.05]) * config["normal_mov_speed"]
+    NORMAL_ROT_FILTER = np.array([0.02, 0.02, 0.02]) * config["normal_rot_speed"]
+    ZOOM_SPEED = 0.003 * config["zoom_speed"]
+    EXPOSURE_SPEED = 0.003 * config["exposure_speed"]
+    APERTURE_SPEED = 0.003 * config["aperture_speed"]
+    FOCUS_SPEED = 0.003 * config["focus_speed"]
+    print("Config Load Success")
+    print(config)
+    return None
+
+
+reload_config()
 
 
 class Drone(Gamepad):
@@ -268,7 +291,7 @@ class Drone(Gamepad):
             self.TAPE_RECORDING = False
             print("Drone: Tape record stoped")
         else:
-            for i in range(3): # count down for 3 seconds
+            for i in range(3):  # count down for 3 seconds
                 self.joystick.rumble(0, 0, 0)
                 pygame.time.wait(800)
                 self.joystick.rumble(0.8, 0.8, 200)
@@ -290,7 +313,7 @@ class Drone(Gamepad):
             self.TAPE_PLAYING = False
             print("Drone: Tape play stoped")
         else:
-            for i in range(3): # count down for 3 seconds
+            for i in range(3):  # count down for 3 seconds
                 self.joystick.rumble(0, 0, 0)
                 pygame.time.wait(800)
                 self.joystick.rumble(0.8, 0.8, 200)
@@ -417,7 +440,7 @@ class Drone(Gamepad):
             if self.TAPE_RECORDING:
                 self.tape.append(
                     (self.pos[self.current_pos].copy(),
-                    self.rot[self.current_pos].copy())
+                     self.rot[self.current_pos].copy())
                 )
                 print("Drone: Tape recording, frame: ", len(self.tape))
             elif self.TAPE_PLAYING:
@@ -426,7 +449,7 @@ class Drone(Gamepad):
                     print("Drone: Tape play stoped")
 
             if (
-                self.FOCUS_DROPED
+                    self.FOCUS_DROPED
             ):  # focus droped, recalculate rotation point to focus point
                 self.rot[self.current_pos] = self.__rot_tract_to(
                     self.pos[self.current_pos],

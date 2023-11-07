@@ -1,4 +1,5 @@
 from drone import Drone
+import drone as config_loader
 from plugins.vrclens import VRCLens
 from plugins.omini_controller import OminiController
 from plugins.user_avatar import Avatar
@@ -7,8 +8,8 @@ import time
 import pygame
 import json
 
-config = json.load(open("src/config.json", "r"))
-# config = json.load(open("config.json", "r"))
+# config = json.load(open("src/config.json", "r"))
+config = json.load(open("config.json", "r"))
 OSC_ADRESS = config["osc_adress"]
 OSC_PORT = config["osc_port"]
 TARGET_FPS = config["fps"]
@@ -164,6 +165,16 @@ if __name__ == "__main__":
                         drone.start()
                 drone.update()
                 pygame.time.wait(1000 // TARGET_FPS - 1)
+        elif drone.button_state["0"] and drone.button_state["1"] and drone.button_state["2"] and drone.button_state["3"]:
+            enable_timer = time.perf_counter()
+            while drone.button_state["0"] and drone.button_state["1"] and drone.button_state["2"] and drone.button_state["3"]:
+                if time.perf_counter() - enable_timer > 1:
+                    config_loader.reload_config()
+                    drone.joystick.rumble(0.5, 1, 200)
+                    pygame.time.wait(200)
+                    drone.joystick.rumble(0, 0, 0)
+                    pygame.time.wait(600)
+                    break
 
         """ Routine
         """
